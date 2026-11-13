@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Index 1999 — a search engine for a world that never existed</title>
+        <meta
+            name="description"
+            content="A 1999 search engine run by a language model. Every result is invented. Bring your own Pollinations key."
+        />
+        <meta
+            property="og:title"
+            content="Index 1999 — a search engine for a world that never existed"
+        />
+        <meta
+            property="og:description"
+            content="Ask for anything. A language model invents five 1999 search results and the pages behind them. Bring your own Pollen, or try the sample."
+        />
+        <meta
+            property="og:image"
+            content="https://raw.githubusercontent.com/kreggscode/index-1999/main/screenshot.png"
+        />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body>
+        <div class="page">
+            <header class="masthead">
+                <div class="masthead-inner">
+                    <a class="brand" href="./" aria-label="Index 1999 home">
+                        <span class="brand-mark" aria-hidden="true">✳</span>
+                        <span class="brand-word">Index</span>
+                        <span class="brand-year">1999</span>
+                    </a>
+                    <p class="tagline">
+                        Searching a world that never existed.
+                    </p>
+                    <div class="keybar" aria-label="Connection">
+                        <span id="keyState" class="key-state">Not connected</span>
+                        <button
+                            id="connectButton"
+                            class="mini-button"
+                            type="button"
+                        >
+                            Connect a key
+                        </button>
+                        <button
+                            id="disconnectButton"
+                            class="mini-button ghost"
+                            type="button"
+                            hidden
+                        >
+                            Disconnect
+                        </button>
+                    </div>
+                </div>
+                <div class="key-panel" id="keyPanel" hidden>
+                    <label for="keyInput" class="key-label"
+                        >Paste a Pollinations API key</label
+                    >
+                    <div class="key-row">
+                        <input
+                            id="keyInput"
+                            class="key-input"
+                            type="password"
+                            autocomplete="off"
+                            spellcheck="false"
+                            placeholder="sk_..."
+                        />
+                        <button
+                            id="saveKeyButton"
+                            class="classic-button"
+                            type="button"
+                        >
+                            Connect
+                        </button>
+                    </div>
+                    <p class="key-help">
+                        Your key stays in this browser. Every search spends
+                        your own Pollen. No key?
+                        <a
+                            href="https://enter.pollinations.ai/keys"
+                            target="_blank"
+                            rel="noreferrer"
+                            >Get one here</a
+                        >, or
+                        <button
+                            id="sampleButton"
+                            class="link-button"
+                            type="button"
+                        >
+                            try the sample search
+                        </button>
+                        first.
+                    </p>
+                    <p id="keyError" class="key-error" role="alert"></p>
+                </div>
+            </header>
+
+            <main>
+                <section class="search-hero" aria-labelledby="searchHeading">
+                    <h1 id="searchHeading" class="visually-hidden">
+                        Search the imaginary web
+                    </h1>
+                    <form id="searchForm" class="search-form" role="search">
+                        <label for="queryInput" class="visually-hidden"
+                            >Search query</label
+                        >
+                        <input
+                            id="queryInput"
+                            class="search-input"
+                            name="q"
+                            type="search"
+                            autocomplete="off"
+                            spellcheck="false"
+                            placeholder="Ask the Index anything…"
+                        />
+                        <button
+                            class="classic-button search-button"
+                            type="submit"
+                        >
+                            Search
+                        </button>
+                        <button
+                            id="luckyButton"
+                            class="classic-button lucky-button"
+                            type="button"
+                            disabled
+                        >
+                            I'm feeling lucky
+                        </button>
+                    </form>
+                    <div class="suggestions" aria-label="Suggested searches">
+                        <span class="suggestions-label">Try:</span>
+                        <button
+                            class="suggestion"
+                            type="button"
+                            data-query="why is the internet empty"
+                        >
+                            why is the internet empty
+                        </button>
+                        <button
+                            class="suggestion"
+                            type="button"
+                            data-query="best pizza in the void"
+                        >
+                            best pizza in the void
+                        </button>
+                        <button
+                            class="suggestion"
+                            type="button"
+                            data-query="how do I know if I am conscious"
+                        >
+                            how do I know if I am conscious
+                        </button>
+                        <button
+                            class="suggestion"
+                            type="button"
+                            data-query="1999 web design trends"
+                        >
+                            1999 web design trends
+                        </button>
+                    </div>
+                </section>
+
+                <div id="crawler" class="crawler" hidden aria-live="polite">
+                    <div class="crawler-track">
+                        <div id="crawlerBar" class="crawler-bar"></div>
+                    </div>
+                    <p id="crawlerText" class="crawler-text">
+                        Resolving imaginary DNS…
+                    </p>
+                </div>
+
+                <section
+                    id="resultsSection"
+                    class="results-section"
+                    hidden
+                    aria-live="polite"
+                >
+                    <div class="results-meta">
+                        <p id="resultsStats" class="results-stats"></p>
+                        <div class="results-actions">
+                            <button
+                                id="rerollButton"
+                                class="mini-button ghost"
+                                type="button"
+                                hidden
+                            >
+                                Search again
+                            </button>
+                            <span class="sample-flag" id="sampleFlag" hidden
+                                >Sample search — no key needed</span
+                            >
+                        </div>
+                    </div>
+                    <p id="corrected" class="corrected" hidden></p>
+                    <p id="notice" class="notice" hidden></p>
+                    <ol id="resultsList" class="results-list"></ol>
+                    <div class="pagination">
+                        <button
+                            id="nextButton"
+                            class="link-button next-button"
+                            type="button"
+                        >
+                            Next &gt;
+                        </button>
+                        <span class="pagination-note" id="paginationNote"
+                            >Results 1–5 of a very small web.</span
+                        >
+                    </div>
+                </section>
+
+                <section id="emptyState" class="empty-state">
+                    <div class="empty-card">
+                        <p class="empty-kicker">The Index is open.</p>
+                        <p id="searchError" class="search-error" hidden></p>
+                        <h2>
+                            The web is 4,102 pages. Every one of them is made
+                            up.
+                        </h2>
+                        <p>
+                            Index 1999 is not a search engine. It is a language
+                            model pretending to be one. Ask it for a topic and
+                            it will invent five results, complete with
+                            Geocities URLs, guestbooks, and a page that has
+                            been under construction since April.
+                        </p>
+                        <p class="empty-small">
+                            Bring your own Pollinations key to search. Or take
+                            the
+                            <button
+                                id="emptySampleButton"
+                                class="link-button"
+                                type="button"
+                            >
+                                free sample search
+                            </button>
+                            first.
+                        </p>
+                    </div>
+                    <aside class="index-card" aria-label="Index statistics">
+                        <h3>Index status</h3>
+                        <dl>
+                            <div>
+                                <dt>Pages indexed</dt>
+                                <dd>4,102</dd>
+                            </div>
+                            <div>
+                                <dt>Last crawl</dt>
+                                <dd>June 12, 1999</dd>
+                            </div>
+                            <div>
+                                <dt>Visitors online</dt>
+                                <dd id="visitorCount">14</dd>
+                            </div>
+                            <div>
+                                <dt>Search engine</dt>
+                                <dd>One (1) model</dd>
+                            </div>
+                        </dl>
+                        <p class="counter-label">You are visitor</p>
+                        <p id="hitCounter" class="hit-counter">000,014</p>
+                        <p class="index-card-note">
+                            Best viewed in Netscape Navigator 4.0 at 800×600.
+                        </p>
+                    </aside>
+                </section>
+            </main>
+
+            <footer class="footer">
+                <p>
+                    <strong>Index 1999</strong> is a work of fiction. Every
+                    search result and every page is invented by a
+                    <a
+                        href="https://pollinations.ai"
+                        target="_blank"
+                        rel="noreferrer"
+                        >Pollinations</a
+                    >
+                    language model. It does not crawl, fetch, or rank the real
+                    web.
+                </p>
+                <p class="footer-small">
+                    <span class="construction">🚧 Under construction since 1999</span>
+                    <span aria-hidden="true"> · </span>
+                    <a
+                        href="https://github.com/kreggscode/index-1999"
+                        target="_blank"
+                        rel="noreferrer"
+                        >Source</a
+                    >
+                    <span aria-hidden="true"> · </span>
+                    <span>No cookies, one hit counter</span>
+                </p>
+            </footer>
+        </div>
+
+        <dialog id="pageDialog" class="browser-dialog">
+            <div class="browser">
+                <div class="browser-titlebar">
+                    <span class="browser-dots" aria-hidden="true"
+                        ><i></i><i></i><i></i
+                    ></span>
+                    <span id="pageTitleBar" class="browser-title"
+                        >Index 1999</span
+                    >
+                    <button
+                        id="closePageButton"
+                        class="browser-close"
+                        type="button"
+                        aria-label="Close this page"
+                    >
+                        ×
+                    </button>
+                </div>
+                <div class="browser-urlbar">
+                    <span class="browser-label">Location:</span>
+                    <span id="pageUrlBar" class="browser-url">http://</span>
+                </div>
+                <div class="browser-body">
+                    <div id="pageLoading" class="page-loading">
+                        <p>Contacting the server…</p>
+                        <p class="page-loading-small">
+                            (There is no server. There is only a model.)
+                        </p>
+                    </div>
+                    <article id="pageContent" class="page-content" hidden>
+                        <h1 id="pageTitle"></h1>
+                        <p class="page-byline" id="pageByline"></p>
+                        <div id="pageParagraphs"></div>
+                        <hr />
+                        <p id="pageFooter" class="page-footer"></p>
+                    </article>
+                    <p id="pageError" class="page-error" hidden></p>
+                </div>
+                <div class="browser-statusbar">
+                    <span id="pageStatus">Done.</span>
+                    <span class="browser-status-right"
+                        ><span class="browser-lock">🔒</span> imaginary
+                        SSL</span
+                    >
+                </div>
+            </div>
+        </dialog>
+
+        <div id="toast" class="toast" role="status" hidden></div>
+
+        <script type="module" src="app.js"></script>
+    </body>
+</html>
