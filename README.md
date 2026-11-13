@@ -1,3 +1,5 @@
+[![Made with pollinations.ai](https://raw.githubusercontent.com/pollinations/pollinations/main/packages/ui/src/brand/badge-made-with.svg)](https://pollinations.ai/?ref=badge)
+
 # Index 1999
 
 **A search engine for a world that never existed.**
