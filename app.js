@@ -3,6 +3,10 @@ const GEN = "https://gen.pollinations.ai";
 const ENTER = "https://enter.pollinations.ai";
 const TEXT_MODEL = "openai";
 const KEY_STORE = "index1999.key";
+// Optional: your own App Key (pk_...) from enter.pollinations.ai/keys, with
+// this page's URL as a redirect URI. It names the app on the sign-in screen and
+// lets you turn on developer earnings. Sign-in works without it.
+const APP_KEY = "";
 const HITS_STORE = "index1999.hits";
 
 const $ = (id) => document.getElementById(id);
@@ -137,7 +141,7 @@ function bumpHits() {
 
 function readStoredKey() {
     try {
-        return localStorage.getItem(KEY_STORE) || "";
+        return sessionStorage.getItem(KEY_STORE) || "";
     } catch {
         return "";
     }
@@ -145,7 +149,7 @@ function readStoredKey() {
 
 function storeKey(value) {
     try {
-        localStorage.setItem(KEY_STORE, value);
+        sessionStorage.setItem(KEY_STORE, value);
     } catch {
         /* private mode: keep it in memory */
     }
@@ -153,7 +157,7 @@ function storeKey(value) {
 
 function clearStoredKey() {
     try {
-        localStorage.removeItem(KEY_STORE);
+        sessionStorage.removeItem(KEY_STORE);
     } catch {
         /* ignore */
     }
@@ -172,69 +176,47 @@ function setConnected(value) {
         el.textContent = `Connected · ${maskKey(value)}`;
         el.classList.add("connected");
         $("disconnectButton").hidden = false;
-        $("connectButton").textContent = "Change key";
+        $("connectButton").hidden = true;
     } else {
         el.textContent = "Not connected";
         el.classList.remove("connected");
         $("disconnectButton").hidden = true;
-        $("connectButton").textContent = "Connect a key";
+        $("connectButton").hidden = false;
     }
 }
 
 function openKeyPanel() {
     $("keyPanel").hidden = false;
-    $("keyInput").focus();
+    $("signInButton").focus();
     $("keyError").textContent = "";
 }
 
 function closeKeyPanel() {
     $("keyPanel").hidden = true;
-    $("keyInput").value = "";
     $("keyError").textContent = "";
 }
 
-async function validateKey(value) {
-    const response = await fetch(`${ENTER}/api/account/balance`, {
-        headers: { authorization: `Bearer ${value}` },
+// Pollinations asks the visitor to approve this app, then sends them back with
+// a key for their own Pollen in the URL fragment: #api_key=sk_...
+function signIn() {
+    const params = new URLSearchParams({
+        redirect_uri: window.location.origin + window.location.pathname,
     });
-    if (response.ok) return;
-    if (response.status === 401 || response.status === 403) {
-        throw new Error(
-            "That key was rejected. Copy it again from enter.pollinations.ai/keys.",
-        );
-    }
-    throw new Error(`Could not check the key (HTTP ${response.status}).`);
+    if (APP_KEY) params.set("client_id", APP_KEY);
+    window.location.href = `${ENTER}/authorize?${params}`;
 }
 
-function isKeyShape(value) {
-    return /^sk_.{8,}$/.test(value);
-}
-
-async function connectKey() {
-    const input = $("keyInput");
-    const value = input.value.trim();
-    const error = $("keyError");
-    error.textContent = "";
-    if (!isKeyShape(value)) {
-        error.textContent =
-            "A Pollinations key starts with sk_ and is longer than this.";
-        return;
-    }
-    const button = $("saveKeyButton");
-    button.disabled = true;
-    button.textContent = "Checking…";
-    try {
-        await validateKey(value);
-        storeKey(value);
-        setConnected(value);
-        closeKeyPanel();
+function readSignInResult() {
+    const hash = new URLSearchParams(window.location.hash.slice(1));
+    if (!hash.has("api_key") && !hash.has("error")) return;
+    const { pathname, search } = window.location;
+    history.replaceState(null, "", pathname + search);
+    const key = hash.get("api_key");
+    if (key) {
+        storeKey(key);
         showToast("Connected. Every search spends your own Pollen.");
-    } catch (err) {
-        error.textContent =
-            err instanceof Error ? err.message : "Could not check that key.";
-    } finally {
-        button.disabled = false;
-        button.textContent = "Connect";
+    } else {
+        showToast("Sign-in was cancelled.");
     }
 }
 
@@ -276,12 +258,12 @@ async function chatJSON(system, user, maxTokens) {
         }
         if (response.status === 401 || response.status === 403) {
             throw new Error(
-                "That key was rejected. Check it at enter.pollinations.ai/keys.",
+                "Your sign-in expired. Disconnect and sign in again.",
             );
         }
         if (response.status === 402) {
             throw new Error(
-                "This key is out of Pollen. Top up or use a different key.",
+                "Out of Pollen, or the sign-in budget is used up. Top up or sign in again.",
             );
         }
         if (response.status === 429) {
@@ -429,7 +411,7 @@ function showSample({ scroll = true } = {}) {
     renderResults(SAMPLE, { sample: true, query: SAMPLE_QUERY, scroll });
     $("queryInput").value = SAMPLE_QUERY;
     bumpHits();
-    showToast("Sample search. Connect a key to search the rest of the web.");
+    showToast("Sample search. Sign in to search the rest of the web.");
 }
 
 const RESULTS_SYSTEM = `You are INDEX 1999, the search engine of a fictional web frozen in 1999. You do not know about anything after 1999 and you never mention being an AI. Given a query, invent five search results from that web. Each result is a page that could exist on Geocities, Tripod, Angelfire, a university department, a Usenet archive, or a personal homepage. Titles are specific and a little odd. Snippets are one or two sentences in the page's own voice, with concrete 1999 details (guestbooks, hit counters, MIDI files, Netscape, under construction). URLs start with http:// and look period-correct. The five results should form a coherent little corner of the web. Never use real current websites or real people. Return JSON only, with this exact shape: {"corrected": string or null, "notice": string or null, "results": [{"title": string, "url": string, "snippet": string}]} with exactly five results.`;
@@ -619,13 +601,7 @@ function openFirstResult() {
 
 function bindEvents() {
     $("connectButton").addEventListener("click", openKeyPanel);
-    $("saveKeyButton").addEventListener("click", connectKey);
-    $("keyInput").addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            connectKey();
-        }
-    });
+    $("signInButton").addEventListener("click", signIn);
     $("disconnectButton").addEventListener("click", () => {
         clearStoredKey();
         setConnected("");
@@ -659,7 +635,7 @@ function bindEvents() {
             if (state.key) search(query);
             else {
                 openKeyPanel();
-                showToast("Connect a key, or try the free sample search.");
+                showToast("Sign in, or try the free sample search.");
             }
         });
     });
@@ -667,6 +643,7 @@ function bindEvents() {
 
 function init() {
     bindEvents();
+    readSignInResult();
     const stored = readStoredKey();
     setConnected(stored);
     const hits = Number(localStorage.getItem(HITS_STORE) || "14");
