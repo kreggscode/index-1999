@@ -10,7 +10,7 @@ under-construction GIF is invented on the spot.
 
 - Ask for anything and get five period-correct search results.
 - Click a result and the model writes the page behind it.
-- Bring your own Pollinations key, so every search spends your own Pollen.
+- Sign in with Pollinations, so every search spends your own Pollen.
 - Or press **try the sample search** and explore the Empty Web with no key at
   all.
 
@@ -47,9 +47,11 @@ index — crawler, ranking, snippets, and the pages themselves.
 - There is no backend, no database, and no real crawl. The app is static
   HTML/CSS/JS and can be hosted on GitHub Pages.
 
-The key is stored in `localStorage` and sent only to
-`gen.pollinations.ai`. Get one at
-[enter.pollinations.ai/keys](https://enter.pollinations.ai/keys).
+Visitors sign in with Pollinations
+([Bring your own Pollen](https://github.com/pollinations/pollinations/blob/main/BRING_YOUR_OWN_POLLEN.md)).
+The key they approve is kept in `sessionStorage` and sent only to
+`gen.pollinations.ai`. To show the app's name on the sign-in screen, put your
+own App Key in `APP_KEY` at the top of `app.js`.
 
 ### The no-key sample
 

@@ -6,7 +6,7 @@
         <title>Index 1999 — a search engine for a world that never existed</title>
         <meta
             name="description"
-            content="A 1999 search engine run by a language model. Every result is invented. Bring your own Pollinations key."
+            content="A 1999 search engine run by a language model. Every result is invented. Sign in with Pollinations to search."
         />
         <meta
             property="og:title"
@@ -44,7 +44,7 @@
                             class="mini-button"
                             type="button"
                         >
-                            Connect a key
+                            Sign in
                         </button>
                         <button
                             id="disconnectButton"
@@ -57,35 +57,19 @@
                     </div>
                 </div>
                 <div class="key-panel" id="keyPanel" hidden>
-                    <label for="keyInput" class="key-label"
-                        >Paste a Pollinations API key</label
-                    >
+                    <p class="key-label">Sign in with Pollinations to search</p>
                     <div class="key-row">
-                        <input
-                            id="keyInput"
-                            class="key-input"
-                            type="password"
-                            autocomplete="off"
-                            spellcheck="false"
-                            placeholder="sk_..."
-                        />
                         <button
-                            id="saveKeyButton"
+                            id="signInButton"
                             class="classic-button"
                             type="button"
                         >
-                            Connect
+                            Sign in with Pollinations
                         </button>
                     </div>
                     <p class="key-help">
-                        Your key stays in this browser. Every search spends
-                        your own Pollen. No key?
-                        <a
-                            href="https://enter.pollinations.ai/keys"
-                            target="_blank"
-                            rel="noreferrer"
-                            >Get one here</a
-                        >, or
+                        Every search spends your own Pollen. No account yet?
+                        Signing in creates one, or
                         <button
                             id="sampleButton"
                             class="link-button"
@@ -229,7 +213,7 @@
                             been under construction since April.
                         </p>
                         <p class="empty-small">
-                            Bring your own Pollinations key to search. Or take
+                            Sign in with Pollinations to search. Or take
                             the
                             <button
                                 id="emptySampleButton"
